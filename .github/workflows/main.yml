@@ -1,0 +1,42 @@
+name: Publish
+  
+on:
+  workflow_dispatch:
+
+jobs:
+
+  publish:
+    permissions: write-all
+    runs-on: [macos-latest]
+    steps:
+    
+      - name: download 
+        uses: 4D-JP/fetch-gh-release-asset@master
+        with:
+          version: '0.0.0'
+          file: sample.app.xz
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: extract
+        run: |
+          tar xvJf sample.app.xz
+          
+      - name: codesign
+        id: codesign
+        uses: miyako/4D/.github/actions/deployment-codesign-product@v1
+        with: 
+          sign: ${{ secrets.CODESIGN_APPLE_ID }} 
+          keychain: ${{ steps.setup.outputs.KEYCHAIN_PATH }}
+          apple_id: ${{ secrets.NOTARYTOOL_APPLE_ID }}         
+          team_id: ${{ secrets.NOTARYTOOL_TEAM_ID }}   
+          password: ${{ secrets.NOTARYTOOL_PASSWORD }}
+          product_path: sample.app
+
+      - name: check entitlements
+        run: |
+          codesign -d -vvv --entitlements - sample.app
+                - name: check entitlements
+                
+      - name: check signature                
+        run: |
+          codesign -v --strict --deep --verbose=2 sample.app
