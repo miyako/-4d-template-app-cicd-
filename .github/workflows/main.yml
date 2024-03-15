@@ -5,7 +5,7 @@ on:
 
 jobs:
 
-  publish:
+  sign:
     permissions: write-all
     runs-on: [macos-latest]
     steps:
