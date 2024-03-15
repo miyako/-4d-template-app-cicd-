@@ -39,11 +39,10 @@ jobs:
           password: ${{ secrets.NOTARYTOOL_PASSWORD }}
           product_path: sample.app
 
-      - name: check entitlements
+      - name: display signature
         run: |
-          codesign -d -vvv --entitlements - sample.app
-                - name: check entitlements
+          codesign -d -vvv sample.app
                 
-      - name: check signature                
+      - name: verify signature                
         run: |
           codesign -v --strict --deep --verbose=2 sample.app
