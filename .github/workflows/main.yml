@@ -21,7 +21,8 @@ jobs:
         run: |
           tar xJf sample.app.xz
           
-      - name: setup keychain 
+      - name: setup keychain
+        id: keychain
         uses: miyako/4D/.github/actions/deployment-setup-keychain@v1
         with:
           APPLE_DEVELOPER_ID_CERTIFICATE: ${{ secrets.APPLE_DEVELOPER_ID_CERTIFICATE }}
@@ -33,10 +34,10 @@ jobs:
         uses: miyako/4D/.github/actions/deployment-codesign-product@v1
         with: 
           sign: ${{ secrets.CODESIGN_APPLE_ID }} 
-          keychain: ${{ steps.setup.outputs.KEYCHAIN_PATH }}
           apple_id: ${{ secrets.NOTARYTOOL_APPLE_ID }}         
           team_id: ${{ secrets.NOTARYTOOL_TEAM_ID }}   
           password: ${{ secrets.NOTARYTOOL_PASSWORD }}
+          keychain: ${{ steps.keychain.outputs.KEYCHAIN_PATH }}
           product_path: sample.app
 
       - name: display signature
