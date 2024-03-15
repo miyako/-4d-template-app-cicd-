@@ -1,0 +1,49 @@
+name: Test Self Hosted
+  
+on:
+  workflow_dispatch:
+
+jobs:
+
+  sign:
+    permissions: write-all
+    runs-on: [macos, self-hosted]
+    steps:
+    
+      - name: download 
+        uses: 4D-JP/fetch-gh-release-asset@master
+        with:
+          version: 'tags/0.0.0'
+          file: sample.app.xz
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: extract
+        run: |
+          tar xJf sample.app.xz
+          
+      - name: setup keychain
+        id: keychain
+        uses: miyako/4D/.github/actions/deployment-setup-keychain@v1
+        with:
+          APPLE_DEVELOPER_ID_CERTIFICATE: ${{ secrets.APPLE_DEVELOPER_ID_CERTIFICATE }}
+          APPLE_DEVELOPER_ID_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          
+      - name: codesign
+        id: codesign
+        uses: miyako/4D/.github/actions/deployment-codesign-product@v1
+        with: 
+          sign: ${{ secrets.CODESIGN_APPLE_ID }} 
+          apple_id: ${{ secrets.NOTARYTOOL_APPLE_ID }}         
+          team_id: ${{ secrets.NOTARYTOOL_TEAM_ID }}   
+          password: ${{ secrets.NOTARYTOOL_PASSWORD }}
+          keychain: ${{ steps.keychain.outputs.KEYCHAIN_PATH }}
+          product_path: sample.app
+
+      - name: display signature
+        run: |
+          codesign -d -vvv sample.app
+                
+      - name: verify signature                
+        run: |
+          codesign -v --strict --deep --verbose=2 sample.app
