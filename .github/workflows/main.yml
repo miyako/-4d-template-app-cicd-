@@ -13,7 +13,7 @@ jobs:
       - name: download 
         uses: 4D-JP/fetch-gh-release-asset@master
         with:
-          version: '0.0.0'
+          version: 'tags/0.0.0'
           file: sample.app.xz
           token: ${{ secrets.GITHUB_TOKEN }}
           
