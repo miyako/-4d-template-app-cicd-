@@ -19,7 +19,7 @@ jobs:
           
       - name: extract
         run: |
-          tar xvJf sample.app.xz
+          tar xJf sample.app.xz
           
       - name: setup keychain 
         uses: miyako/4D/.github/actions/deployment-setup-keychain@v1
